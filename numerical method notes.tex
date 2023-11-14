@@ -1,0 +1,95 @@
+\documentclass[11pt, a4paper]{article}
+
+%% Packages
+\usepackage{amsmath}
+\usepackage{amsfonts,amsthm,amssymb,enumerate}
+\usepackage{pgf,tikz}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+
+%% Page style
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\footrulewidth}{0.4pt}
+\cfoot{Page \thepage\ of \pageref{lastpage}}
+\rhead{Last edited {\scriptsize[\textit{\number\day/\number\month/\number\year}]}}
+\lhead{\rightmark\leftmark}
+\fancyheadoffset{0cm}
+
+\usepackage[headsep=.5cm,headheight=14.5pt,margin=3cm]{geometry}
+%\usepackage{showframe}
+
+%% Shortcuts
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\KK}{\mathbb{K}}
+\newcommand{\OO}{\mathcal{O}}
+\newcommand{\inv}{^{-1}}
+
+%% Theorems
+\newtheoremstyle{break}
+{\topsep}{\topsep}%
+{}{}%
+{\bfseries}{}%
+{\newline}{}%
+
+\theoremstyle{break}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{propdefn}[thm]{Proposition/Definition}
+\newtheorem{lemdefn}[thm]{Lemma/Definition}
+\newtheorem{eg}[thm]{Example}
+\newtheorem{ex}[thm]{Exercise}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{note}[thm]{Note}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{rmk}[thm]{Remark}
+\newtheorem{re}[thm]{Results}
+\newtheorem{code}[thm]{Code}
+\newenvironment{prf}[1][\proofname]{%
+	\begin{proof}[#1]$ $\par\nobreak\ignorespaces
+	}{%
+	\end{proof}
+}
+
+%% Magic
+\makeatletter
+\newcommand*{\perm}[1]{\text{$(\@for\tmp:=#1\do{{\tmp}\;}\hspace{-.277em})$}}%permutation
+\makeatother
+\makeatletter
+\newcommand*{\permcom}[1]{\text{$(#1)$}}%permutation
+\makeatother
+\newcommand*{\ideal}[1]{\text{$\langle#1\rangle$}}%ideal
+\newcommand*{\Ideal}[1]{\text{$\left\langle#1\right\rangle$}}%ideal
+\def\matrixtwooneHelp(#1,#2){\begin{pmatrix}#1\\#2\end{pmatrix}}%matrix
+\def\matrixtwoHelp(#1,#2,#3,#4){\begin{pmatrix}#1&#2\\#3&#4\end{pmatrix}}%matrix
+\def\matrixthreeHelp(#1,#2,#3,#4,#5,#6,#7,#8,#9){\begin{pmatrix}#1&#2&#3\\#4&#5&#6\\#7&#8&#9 \end{pmatrix}}%matrix
+\newcommand*{\matrixtwo}[1]{\matrixtwoHelp(#1)}
+\newcommand*{\matrixtwoone}[1]{\matrixtwooneHelp(#1)}
+\newcommand*{\matrixthree}[1]{\matrixthreeHelp(#1)}
+\newcommand*{\size}[1]{|#1|}%size of group
+\newcommand*{\Size}[1]{{\left|#1\right|}}%big size
+\newcommand*{\ind}[2]{|#1:#2|}
+\newcommand*{\set}[1]{\{#1\}}%set 
+\newcommand*{\Set}[1]{\left\{#1\right\}}%set 
+\newcommand*{\paren}[1]{(#1)}%set 
+\newcommand*{\Paren}[1]{\left(#1\right)}%set 
+\newcommand{\cross}{\times}
+\newcommand{\rcross}{\rtimes}
+\newcommand{\lcross}{\ltimes}
+\newcommand{\id}{\mathsf{id}}
+
+
+\begin{document}
+a
+
+
+\label{lastpage}
+\end{document}
