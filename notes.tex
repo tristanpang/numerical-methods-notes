@@ -64,6 +64,12 @@
 	\end{proof}
 }
 
+%% Code
+\usepackage{listings}
+\lstset{language=Python,upquote=true, 
+	numbers=left, stepnumber=1, 
+	basicstyle=\small\ttfamily,columns=fullflexible,tabsize=5, xleftmargin=.25in, 	showstringspaces=false,breaklines=true,keepspaces}
+
 %% Magic
 \makeatletter
 \newcommand*{\perm}[1]{\text{$(\@for\tmp:=#1\do{{\tmp}\;}\hspace{-.277em})$}}%permutation
@@ -96,6 +102,7 @@
 \newcommand{\ve}{\mathbf} % Vectors
 \newcommand{\dt}{\Delta t}
 \newcommand{\dx}{\Delta x}
+\newcommand{\der}[2]{\frac{\partial #1}{\partial #2}}
 
 \begin{document}
 \begin{center}
@@ -127,14 +134,13 @@ The error at the first iteration is \begin{align*}
 &= \frac{|b-a|}{2}.\end{align*}
 Thus, in general \[\epsilon_n = |c-x^*| \leq \frac{|b-a|}{2},\] i.e. the error is at least halved each iteration, and the method converges linearly.
 \begin{eg}
-The positive zero of the polynomial $f(x)-x^2-2$ can be approximated using bisection with starting guesses $1$ and $2$.
-
+The positive zero of the polynomial $f(x)=x^2-2$ can be approximated using bisection with starting guesses $a=1$ and $b=2$. Then $f(1)=-1<0$ and $f(2)=2>0$. It follows (by continuity of $f$) that there is a root in the interval $[1,2]$. Then $f(c)=f(1.5)=0.25>0$. Thus, we replace $b=2$ with $c=1.5$. Continuing yields $1.25, 1.375, 1.4375, \ldots$. Eventually, we get an approximation for  $\sqrt 2$.
 \end{eg}
 
 \subsection{Newton's method}
 A quicker alternative to bisection is Newton's method (also known as Newton-Raphson). Given an initial guess $x_0$ and a sufficiently nice derivative $f'$, we may estimate a zero $x^*$ of $f$.
 
-Consider the Taylor expansion of $f$ around $x_n$ (see Appendix~\ref{sec:bigO} for the big $O$ notation and Appendix~\ref{sec:taylor} for Taylor): \[f(x)=f(x_n)+f'(x_n)(x-x_n)+O((x-x_n)^2).\] If we suppose that $x_n$ is close to the root $x^*$, the zero of the linear approximation $x_{n+1}$ is a good approximation for $x^*$ \[f(x_{n+1})\approx 0=f(x_n)+(x_{n+1}-x_n)f'(x_n).\] Rearranging, we arrive at the iterative formula for Newton's method \begin{equation} x_{n+1} = x_n-\frac{f(x_n)}{f'(x_n)}.\end{equation} This process is illustrated in Figure~\ref{fig:taylor}.
+Consider the Taylor expansion of $f$ around $x_n$ (see Appendix~\ref{sec:bigO} for the big $O$ notation and Appendix~\ref{sec:taylor} for Taylor): \[f(x)=f(x_n)+f'(x_n)(x-x_n)+O((x-x_n)^2).\] If we suppose that $x_n$ is close to the root $x^*$, the zero of the linear approximation $x_{n+1}$ is a good approximation for $x^*$ \[f(x_{n+1})\approx 0=f(x_n)+(x_{n+1}-x_n)f'(x_n).\] Rearranging, we arrive at the iterative formula for Newton's method \begin{equation}\label{eq:newtonStep} x_{n+1} = x_n-\frac{f(x_n)}{f'(x_n)}.\end{equation} This process is illustrated in Figure~\ref{fig:taylor}.
 
 \begin{figure}\centering
 	\includegraphics[width=0.7\textwidth]{example-image-golden}
@@ -152,18 +158,44 @@ Thus, as $n\to \infty$, $x_{n}\to x^*$ for a root $x^*$ of $f$. In particular, w
 
 \begin{eg}
 The positive zero of the polynomial $f(x)=x^2-2$ can be approximated using Taylor's method with the starting guess $x_0=2$. Differentiating, $f'(x)=2x$. Then we get \begin{align*}
-x_1 &= x_0 - \frac{f(x_0)}{f'(x_0)} = 2 - \frac{2^2-2}{4} = 1.5\\
-x_2 &= 1.5 - \frac{1.5^2-2}{3} = 1.41666667\\
-x_3 &= 1.41421569\\
-x_4 &= 1.41421356 =\sqrt{2}.
+x_1 &= x_0 - \frac{f(x_0)}{f'(x_0)} = 2 - \frac{2^2-2}{4} = 1.5,\\
+x_2 &= 1.5 - \frac{1.5^2-2}{3} = 1.41666667,\\
+x_3 &= 1.41421569,\\
+x_4 &= 1.41421356 \approx\sqrt{2}.
 \end{align*}
+This converges to $\sqrt{2}$ much faster than the bisection method as seen in Figure~\ref{fig:bisectionVsNewton}.
+\begin{figure}\centering
+	\includegraphics[width=0.7\linewidth]{figures/bisectionVsNewton}
+	\caption{Bisection method vs Newton's method for approximating $\sqrt2$}\label{fig:bisectionVsNewton}
+\end{figure}
 \end{eg}
 
+\begin{ex}
+	Observe (in Python or otherwise) that approximating $\sqrt2$ with a bisection guess of $(1, 200)$ and Newton guess of $200$ yields similar log-linear error behaviour for small iteration step~$n$. Show that this is true by looking at Formula~\ref{eq:newtonStep}.
+\end{ex}
 Warning: if $f'(x_n)=0$, Newton's method will not work (division by zero!) -- pick a new~$x_0$. If the derivative is not well behaved (either not defined or close to zero at many points), then Newton's method may not be appropriate.
 
 
 \subsection{Higher dimensions}
 Consider the system of $m$ equations in $n$ variables $\ve{f}(\ve x)=\ve 0$ given by \[\begin{cases} f_1(x_1,x_2, \ldots, x_n) =0,\\f_2(x_1,x_2,\ldots, x_n)=0, \\\hfil\vdots\\ f_m(x_1,x_2,\ldots,x_n)=0.\end{cases}\]
+The iterative step of Newton's method becomes \begin{equation}
+	\label{eq:newtonDim}\ve x_{n+1}=\ve x_n-J(\ve x_n)\inv \ve{f}(\ve x_n),
+\end{equation} where $J$ is the Jacobian matrix of $\mathbf f$ (an analogue to the derivative) given by $J_{ij}=\der{f_i}{x_j}$. This requires either matrix inversion (which is usually hard!) or solving a linear system (see Section~\ref{sec:numla}).
+
+\begin{eg}
+	Consider the steady state of the predator prey model: \[\begin{cases}	
+	f_1(x,y)=Ax-Bxy=0,\\f_2(x,y)=Dxy-Cy=0.
+	\end{cases}\]
+	The Jacobian is \[J=\matrixtwo{\der{f_1}x,\der{f_1}y,\der{f_2}{x},\der{f_2}y}=\matrixtwo{A-By,-Bx,Dy,Dx-C}.	\]
+	Let $\ve x_0=\matrixtwoone{2,1}$. Then \[\ve x_1 = \ve x_0 - J(\ve x_0)\inv \ve f(\ve x_n) = \matrixtwoone{2,1} - \matrixtwo{A-B,-2B,D,2D-C}\inv\matrixtwoone{2A-2B,2D-C}.\]
+\end{eg}
+
+\begin{note}[Useful commands]\
+	\vspace{-2em}\begin{itemize}\itemsep0em
+		\item Python SciPy's \lstinline|otimize.fsolve| finds the roots of a function.
+		\item Python NumPy's \lstinline|linalg.solve| solves a linear system.
+	\end{itemize}
+\end{note}
 
 \section{Finite difference}
 
@@ -171,7 +203,7 @@ Consider the system of $m$ equations in $n$ variables $\ve{f}(\ve x)=\ve 0$ give
 \section{Von Neumann analysis}
 
 
-\section{Numerical linear algebra}
+\section{Numerical linear algebra}\label{sec:numla}
 
 
 \appendix
