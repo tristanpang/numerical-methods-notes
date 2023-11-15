@@ -103,7 +103,10 @@
 \newcommand{\dt}{\Delta t}
 \newcommand{\dx}{\Delta x}
 \newcommand{\der}[2]{\frac{\partial #1}{\partial #2}}
-
+\newcommand{\dder}[2]{\frac{d #1}{d #2}}
+\newcommand{\ddder}[3][2]{\frac{d^#1 #2}{d #3^#1}}
+\newcommand{\eval}[1]{\big\rvert_{#1}}
+\newcommand{\Eval}[1]{\bigg\rvert_{#1}}
 \begin{document}
 \begin{center}
 {\LARGE Numerical Methods}\\
@@ -198,8 +201,26 @@ The iterative step of Newton's method becomes \begin{equation}
 \end{note}
 
 \section{Finite difference}
+\subsection{Discretising ODEs}
+Consider the first order differential equation \[\dder {\ve y}t=\ve f({\ve y},t).\]
+The Taylor expansion of ${\ve y}$ about time $t$ is \[\ve y(t+\dt)=\ve y(t)+ \dder {\ve y}t\dt+O((\dt)^2).\] Rearranging and dividing through by $\dt$ yields the first order accurate finite difference approximation \begin{equation}\label{eq:findifapp}\dder{\ve y}t=\frac{{\ve y}(t+dt)-{\ve y}(t)}{dt} + O(\dt).\end{equation}
+\subsubsection{Forward Euler}
+Let $t_{n+1}=t_n+\dt=t_0+n\dt$. Given $\ve y(t_n)$, we can step forward one time step by substituting Equation~\ref{eq:findifapp} into the differential equation \[\ve y(t_{n+1})=\ve y(t_n)+\ve f(\ve y(t_n),t_n)\dt +O((\dt)^2).\]
+The local truncation error is then \[\tau_{n+1}=({\ve y(t_{n+1})-\ve y(t_n)})-\ve f(\ve y(t_n),t_n)\dt=O((\dt)^2).\] (Note that LeVeque calls $\frac{\tau_{n+1}}{\dt}$ the local truncation error.) Since the total number of steps is proportional to $\frac1{\dt}$, the global error is $\frac{\tau_{n+1}}{\dt}=O(\dt)$. This tells us that the forward Euler method is first order accurate. Since the next time step can be calculated directly from the information from the current time step, forward Euler is an explicit method.
 
+\subsubsection{Backward Euler}
+If we take a backward difference instead of a forward difference, we get \[\ve y(t_n)=\ve y(t_{n+1})-\ve f(\ve y(t_{n+1}),t_{n+1})\dt +O((\dt)^2).\] Since we cannot determine $\ve y(t_n)$ directly, backward Euler is implicit, and we must use a root finding algorithm.
 
+\begin{eg}
+Consider the IVP $\dder yt=-ky=f(y,t)$ with initial value $y(t_0)=1$. This can be integrated exactly and has an analytical solution of $y(t)=\exp(-k(t-t_0))$. Using forward Euler, \[y(t_1)=y(t_0)=f(y(t_0),t_0)\dt=1-k\dt.\] Similarly, for backward Euler, \[y(t_1)=y(t_0)+f(y(t_1),t_1)\dt = 1-ky(t_1)\dt \implies y(t_1)=\frac1{1+k\dt}.\]
+\end{eg}
+
+\subsubsection{Central difference}
+One way to reduce the truncation error from the first order forward and backward Euler schemes is to use more points in time, say \[y'\approx a	y_{n+1}+by+cy_{n-1},\] where $y=y(t_n)$, $y_{n+1}=y(t_{n+1})$, $y_{n-1}=y(t_{n-1})$ and $y' = \dder yt\eval{t_n}$. To find the best choices of $a,b,c$, we first Taylor expand \begin{align*}
+y_{n+1}&=y+y'\dt+\frac{y''}{2}(\dt)^2+\frac{y''}{6}(\dt)^3+O((\dt)^4),\\
+y_{n-1}&=y-y'\dt+\frac{y''}{2}(\dt)^2-\frac{y''}{6}(\dt)^3+O((\dt)^4).
+\end{align*} It follows that \[ay_{n+1}+by+cy_{n-1}=(a+b+c)y+(a-c)y'\dt+(a+c)\frac{y''}{2}(\dt)^2 +(a-c)\frac{y'''}{6}(\dt^3)+O((\dt)^4).\]
+To make the first two terms disappear, we want $(a+b+c)=(a-c)=0$, i.e. $a=-c$ and $b=0$. Making the decision $(a-c)\dt=1$, we get $a=\frac1{2\dt}$ and $c=-\frac1{2\dt}$. The centred difference of $y'$ is thus \[\dder yt\Eval{t_n}=\frac{y_{n+1}-y_{n-1}}{2\dt}+O((\dt)^2)\] which is second order accurate.
 \section{Von Neumann analysis}
 
 
