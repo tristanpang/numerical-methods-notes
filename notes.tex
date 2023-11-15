@@ -215,12 +215,53 @@ If we take a backward difference instead of a forward difference, we get \[\ve y
 Consider the IVP $\dder yt=-ky=f(y,t)$ with initial value $y(t_0)=1$. This can be integrated exactly and has an analytical solution of $y(t)=\exp(-k(t-t_0))$. Using forward Euler, \[y(t_1)=y(t_0)=f(y(t_0),t_0)\dt=1-k\dt.\] Similarly, for backward Euler, \[y(t_1)=y(t_0)+f(y(t_1),t_1)\dt = 1-ky(t_1)\dt \implies y(t_1)=\frac1{1+k\dt}.\]
 \end{eg}
 
-\subsubsection{Central difference}
+\begin{figure}\centering
+	\includegraphics[width=0.7\textwidth]{example-image-golden}
+	\caption{Euler}\label{fig:euler}
+\end{figure}
+
+\subsection{Central difference}
 One way to reduce the truncation error from the first order forward and backward Euler schemes is to use more points in time, say \[y'\approx a	y_{n+1}+by+cy_{n-1},\] where $y=y(t_n)$, $y_{n+1}=y(t_{n+1})$, $y_{n-1}=y(t_{n-1})$ and $y' = \dder yt\eval{t_n}$. To find the best choices of $a,b,c$, we first Taylor expand \begin{align*}
 y_{n+1}&=y+y'\dt+\frac{y''}{2}(\dt)^2+\frac{y''}{6}(\dt)^3+O((\dt)^4),\\
 y_{n-1}&=y-y'\dt+\frac{y''}{2}(\dt)^2-\frac{y''}{6}(\dt)^3+O((\dt)^4).
 \end{align*} It follows that \[ay_{n+1}+by+cy_{n-1}=(a+b+c)y+(a-c)y'\dt+(a+c)\frac{y''}{2}(\dt)^2 +(a-c)\frac{y'''}{6}(\dt^3)+O((\dt)^4).\]
-To make the first two terms disappear, we want $(a+b+c)=(a-c)=0$, i.e. $a=-c$ and $b=0$. Making the decision $(a-c)\dt=1$, we get $a=\frac1{2\dt}$ and $c=-\frac1{2\dt}$. The centred difference of $y'$ is thus \[\dder yt\Eval{t_n}=\frac{y_{n+1}-y_{n-1}}{2\dt}+O((\dt)^2)\] which is second order accurate.
+We want $a+b+c=a+b=0$, i.e. $a=-c$ and $b=0$. Making the decision $(a-c)\dt=1$, we get $a=\frac1{2\dt}$ and $c=-\frac1{2\dt}$. The centred difference of $y'$ is thus \[\dder yt\Eval{t_n}=\frac{y_{n+1}-y_{n-1}}{2\dt}+O((\dt)^2)\] which is second order accurate.
+
+If instead we took $a+b+c=a-c=0$ and $(a+c)\frac{(\dt)^2}{2}=1$, then $a=c=\frac1{(\dt)^2}$ and $b=\frac{-2}{(\dt)^2}$. The centred difference for the second derivative is \[\ddder yt\Eval{t_n}=\frac{y_{n+1}-2y_n+y_{n-1}}{2}+O((\dt)^2).\]
+
+\subsection{Leap-frog}
+
+\[\ve y_{n+1}=\ve y_{n-1}+2\ve f(\ve y_n,t_n)\dt+O((\dt)^3).\]
+
+Needs forward Euler for the first step.
+
+
+\begin{figure}\centering
+	\includegraphics[width=0.7\textwidth]{example-image-golden}
+	\caption{Leap-frog}\label{fig:leapFrog}
+\end{figure}
+
+Needs time filtering to stop the even/odd time iterations diverging.
+
+\subsubsection{Robert-Asselin Filter}
+
+\subsection{Mid-point}
+Explicit mid-point
+
+Implicit mid-point
+\subsection{Trapezoidal}
+(Also called Crank-Nicolson.)
+
+\begin{eg}
+
+\end{eg}
+
+\subsection{Multi-step}
+
+AB1 = Forward Euler
+
+\subsection{Numerical stability}
+
 \section{Von Neumann analysis}
 
 
