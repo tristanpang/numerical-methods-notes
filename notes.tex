@@ -99,39 +99,49 @@
 
 \begin{document}
 \begin{center}
-\LARGE Numerical Methods
+{\LARGE Numerical Methods}\\
+{\large Compiled by Tristan Pang}\\
+{\the\month/\the\year}
 \end{center}
-These notes are based on the Oxford Numerical Methods course taught by David Marshall (2023 for the NERC DTP) with additional context from LeVeque \cite{leveque_finite_2007}.
+These notes are based on the Oxford Numerical Methods course taught by David Marshall (2023 for the NERC DTP) with additional information from LeVeque \cite{leveque_finite_2007}.
+
+These are rough notes only. A polished version may or may not be completed. Please direct all typos to me. The \href{https://github.com/tristanpang/numerical-methods-notes}{GitHub repo}\footnote{https://github.com/tristanpang/numerical-methods-notes} contains \LaTeX\ source, Python scripts for figures, and other useful Python things.
+
 \tableofcontents
 
 
 
 \section{Root finding}
-Consider a function $f(x)$. If $f$ is a quadratic polynomial, we may find the zeros of $f$ using the quadratic formula, but for degrees 5 or larger, there exists no general formula for the zeros (Abel–Ruffini theorem). In general, finding an $x^*$ such that $f(x^*)=0$ cannot be computed exactly. Instead one must employ numerical root finding algorithms. Common methods include the bisection method and Newton's method.
+Consider a sufficiently smooth function $f(x)$. If $f$ is a quadratic polynomial, we may find the zeros of $f$ using the quadratic formula, but for degrees 5 or larger, there exists no general formula for the zeros (Abel–Ruffini theorem). In general, finding an $x^*$ such that $f(x^*)=0$ cannot be computed exactly. Instead one must employ numerical root finding algorithms. Common methods include the bisection method and Newton's method.
 
 \subsection{Bisection method}
+To find a zero $x^*$ of $f$, the bisection method takes two initial guesses $a$ and $b$ such that $a<0$ and $b\geq0$. IVT guarantees a zero between the two guesses. Calculate the midpoint \[c=\frac{a+b}2.\] If $f(c)<0$, replace $a$ with $c$; otherwise replace $b$ with $c$. Continue iterating until convergence is observed as shown in Figure~\ref{fig:bisection}.
 
-\begin{figure}[h]\centering
+\begin{figure}\centering
 	\includegraphics[width=0.7\textwidth]{example-image-golden}
 	\caption{Bisection method}\label{fig:bisection}
 \end{figure}
 
+The error at the first iteration is \begin{align*}
+\epsilon_1 &= |c - x^*| \\&= \Size{\frac{a-x^*}{2}+\frac{b-x^*}{2}}\\&= \Bigg|\Size{\frac{a-x^*}{2}}-\Size{\frac{b-x^*}{2}}\Bigg| \\&\leq \Size{\frac{a-x^*}{2}-\frac{b-x^*}{2}}\\
+&= \frac{|b-a|}{2}.\end{align*}
+Thus, in general \[\epsilon_n = |c-x^*| \leq \frac{|b-a|}{2},\] i.e. the error is at least halved each iteration, and the method converges linearly.
 \begin{eg}
-
+The positive zero of the polynomial $f(x)-x^2-2$ can be approximated using bisection with starting guesses $1$ and $2$.
 
 \end{eg}
 
 \subsection{Newton's method}
-A quicker alternative to bisection is Newton's method (also known as Newton-Raphson). Given an initial guess $x_0$ and a sufficiently nice derivative $f'$, we may estimate the zero $x^*$ of $f$.
+A quicker alternative to bisection is Newton's method (also known as Newton-Raphson). Given an initial guess $x_0$ and a sufficiently nice derivative $f'$, we may estimate a zero $x^*$ of $f$.
 
 Consider the Taylor expansion of $f$ around $x_n$ (see Appendix~\ref{sec:bigO} for the big $O$ notation and Appendix~\ref{sec:taylor} for Taylor): \[f(x)=f(x_n)+f'(x_n)(x-x_n)+O((x-x_n)^2).\] If we suppose that $x_n$ is close to the root $x^*$, the zero of the linear approximation $x_{n+1}$ is a good approximation for $x^*$ \[f(x_{n+1})\approx 0=f(x_n)+(x_{n+1}-x_n)f'(x_n).\] Rearranging, we arrive at the iterative formula for Newton's method \begin{equation} x_{n+1} = x_n-\frac{f(x_n)}{f'(x_n)}.\end{equation} This process is illustrated in Figure~\ref{fig:taylor}.
 
-\begin{figure}[h]\centering
+\begin{figure}\centering
 	\includegraphics[width=0.7\textwidth]{example-image-golden}
 	\caption{Newton's method}\label{fig:taylor}
 \end{figure}
 
-The error at iteration $n$ is $\epsilon_n = x_n-x^*$. By considering the quadratic term in the Taylor expansion around $x_n$, we get \begin{align*}f(x^*)&=f(x_n)+f'(x_n)(x^*-x_n)+\frac{f''(x_n)}{2}(x^*-x_n)^2 + O((x^*-x_n)^3)\\
+The signed error at iteration $n$ is $\epsilon_n = x_n-x^*$. By considering the quadratic term in the Taylor expansion around $x_n$, we get \begin{align*}f(x^*)&=f(x_n)+f'(x_n)(x^*-x_n)+\frac{f''(x_n)}{2}(x^*-x_n)^2 + O((x^*-x_n)^3)\\
 \implies\quad& 0 = f(x_n) + f'(x_n)(x^*-x_n)+\frac{f''(x_n)}{2}\epsilon_n^2 + O(\epsilon_n^3)\\
 \implies\quad& -\frac{f(x_n)}{f'(x_n)}=(x^*-x_n)+\frac{f''(x_n)}{2}\epsilon_n^2 + O(\epsilon_n^3)\\
 \implies\quad& x_{n+1}-x_n=(x^*-x_n)+\frac{f''(x_n)}{2}\epsilon_n^2 + O(\epsilon_n^3)\\
