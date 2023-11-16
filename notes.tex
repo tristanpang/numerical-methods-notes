@@ -5,7 +5,7 @@
 \usepackage{amsfonts,amsthm,amssymb,enumerate}
 \usepackage{pgf,tikz}
 \usepackage{graphicx}
-\graphicspath{{../figures/}}
+\graphicspath{{./figures/}}
 \usepackage[hidelinks]{hyperref}
 
 %% Page style
@@ -170,7 +170,7 @@ x_4 &= 1.41421356 \approx\sqrt{2}.
 \end{align*}
 This converges to $\sqrt{2}$ much faster than the bisection method as seen in Figure~\ref{fig:bisectionVsNewton}.
 \begin{figure}\centering
-	\includegraphics[width=0.7\linewidth]{figures/bisectionVsNewton}
+	\includegraphics[width=0.7\linewidth]{bisectionVsNewton}
 	\caption{Bisection method vs Newton's method for approximating $\sqrt2$}\label{fig:bisectionVsNewton}
 \end{figure}
 \end{eg}
@@ -205,13 +205,14 @@ The iterative step of Newton's method becomes \begin{equation}
 \section{Finite difference}
 \subsection{Discretising ODEs}
 Consider the first order differential equation \[\dder {\ve y}t=\ve f({\ve y},t).\]
-The Taylor expansion of ${\ve y}$ about time $t$ is \[\ve y(t+\dt)=\ve y(t)+ \dder {\ve y}t\dt+O((\dt)^2).\] Rearranging and dividing through by $\dt$ yields the first order accurate finite difference approximation \begin{equation}\label{eq:findifapp}\dder{\ve y}t=\frac{{\ve y}(t+dt)-{\ve y}(t)}{dt} + O(\dt).\end{equation}
+The Taylor expansion of ${\ve y}$ about time $t$ is \[\ve y(t+\dt)=\ve y(t)+ \dder {\ve y}t\dt+O((\dt)^2).\] Rearranging and dividing through by $\dt$ yields the first order accurate finite difference approximation \begin{equation}\label{eq:findifapp}\dder{\ve y}t=\frac{{\ve y}(t+dt)-{\ve y}(t)}{\dt} + O(\dt).\end{equation}
 \subsubsection{Forward Euler}
 Let $t_{n+1}=t_n+\dt=t_0+n\dt$. Given $\ve y(t_n)$, we can step forward one time step by substituting Equation~\ref{eq:findifapp} into the differential equation \[\ve y(t_{n+1})=\ve y(t_n)+\ve f(\ve y(t_n),t_n)\dt +O((\dt)^2).\]
-The local truncation error is then \[\tau_{n+1}=({\ve y(t_{n+1})-\ve y(t_n)})-\ve f(\ve y(t_n),t_n)\dt=O((\dt)^2).\] (Note that LeVeque calls $\frac{\tau_{n+1}}{\dt}$ the local truncation error.) Since the total number of steps is proportional to $\frac1{\dt}$, the global error is $\frac{\tau_{n+1}}{\dt}=O(\dt)$. This tells us that the forward Euler method is first order accurate. Since the next time step can be calculated directly from the information from the current time step, forward Euler is an explicit method.
+Letting $\ve y_{n+1}\approx \ve y(t_{n+1})$, a forward Euler step is \[\ve y_{n+1}=\ve y_n + \ve f(\ve y_n,t_n)\dt.\]
+The local truncation error is then \[\tau_{n+1}=({\ve y(t_{n+1})-\ve y(t_n)})-\ve f(\ve y_n,t_n)\dt=O((\dt)^2).\] (Note that LeVeque calls $\frac{\tau_{n+1}}{\dt}$ the local truncation error.) Since the total number of steps is proportional to $\frac1{\dt}$, the global error is $\frac{\tau_{n+1}}{\dt}=O(\dt)$. This tells us that the forward Euler method is first order accurate. Since the next time step can be calculated directly from the information from the current time step, forward Euler is an explicit method.
 
 \subsubsection{Backward Euler}
-If we take a backward difference instead of a forward difference, we get \[\ve y(t_n)=\ve y(t_{n+1})-\ve f(\ve y(t_{n+1}),t_{n+1})\dt +O((\dt)^2).\] Since we cannot determine $\ve y(t_n)$ directly, backward Euler is implicit, and we must use a root finding algorithm.
+If we take a backward difference instead of a forward difference, we get \[\ve y(t_n)=\ve y(t_{n+1})-\ve f(\ve y(t_{n+1}),t_{n+1})\dt +O((\dt)^2).\] Letting $\ve y_{n+1}\approx \ve y(t_{n+1})$, a backward Euler step is \[\ve y_{n+1}=\ve y_n + \ve f(\ve y_{n+1},t_n)\dt.\] Since we cannot determine $\ve y(t_n)$ directly, backward Euler is implicit, and we must use a root finding algorithm.
 
 \begin{eg}
 Consider the IVP $\dder yt=-ky=f(y,t)$ with initial value $y(t_0)=1$. This can be integrated exactly and has an analytical solution of $y(t)=\exp(-k(t-t_0))$. Using forward Euler, \[y(t_1)=y(t_0)=f(y(t_0),t_0)\dt=1-k\dt.\] Similarly, for backward Euler, \[y(t_1)=y(t_0)+f(y(t_1),t_1)\dt = 1-ky(t_1)\dt \implies y(t_1)=\frac1{1+k\dt}.\]
@@ -232,21 +233,23 @@ We want $a+b+c=a+b=0$, i.e. $a=-c$ and $b=0$. Making the decision $(a-c)\dt=1$, 
 If instead we took $a+b+c=a-c=0$ and $(a+c)\frac{(\dt)^2}{2}=1$, then $a=c=\frac1{(\dt)^2}$ and $b=\frac{-2}{(\dt)^2}$. The centred difference for the second derivative is \[\ddder yt\Eval{t_n}=\frac{y_{n+1}-2y_n+y_{n-1}}{2}+O((\dt)^2).\]
 
 \subsection{Leap-frog}
+Leap-frog is a second order explicit method given by
+\[\ve y_{n+1}=\ve y_{n-1}+2\ve f(\ve y_n,t_n)\dt.\]
 
-\[\ve y_{n+1}=\ve y_{n-1}+2\ve f(\ve y_n,t_n)\dt+O((\dt)^3).\]
+We need to use forward Euler for the first step. A stencil is shown in figure~\ref{fig:leapFrog}. Notice that the even and odd iterations are separate, so we need time filtering to stop the even/odd time iterations diverging.
 
-Needs forward Euler for the first step.
 
 
 \begin{figure}\centering
-	\includegraphics[width=0.7\textwidth]{example-image-golden}
+	\includegraphics[width=0.7\linewidth]{leapfrog}
 	\caption{Leap-frog}\label{fig:leapFrog}
 \end{figure}
 
-Needs time filtering to stop the even/odd time iterations diverging.
-
 \subsubsection{Robert-Asselin Filter}
+After solving for $\ve y_{n+1}$, we apply a time filter to $\ve y_n$ to ``smooth'' out the scheme. Define \[\ve y_n^{\text{new}}=\ve y_n+\frac\nu2(\ve y_{n-1}-2\ve y_n+\ve y_{n+1}),\] where $0.01\leq \nu\leq 0.2$ is a smoothing parameter. This adds a small fraction of the two outer points to $\ve y_n$. We then set $\ve y_{n+1}$ to be $\ve y_n^\text{new}$ and $\ve y_{n+1}$ to be $\ve y_n$ before taking the next time step.
+
 \subsection{Other methods}
+We introduce a few more second order schemes.
 \subsubsection{Mid-point}
 Explicit mid-point takes a half forward Euler step before performing the full step
 \[\ve y_{n+1}=\ve y_n + \ve f\Paren{\ve y_n+f(\ve y_n,t_n)\frac{\dt}2,t_{n+\frac12}}\dt.\]
@@ -260,15 +263,24 @@ Consider the ODE $\dder yt=-kt$ with $y(t_0)=1$. The explicit mid-point gives \[
 \end{eg}
 
 \subsection{Multi-step}
-The typical family of multi-step methods are the Adam-Bashforth methods. These are explicit. The key idea is to fit a polynomial to $f(t)$ and integrate over the $t$-step.
+The typical family of multi-step methods are the Adams-Bashforth methods. These are explicit. The key idea is to fit a polynomial to $f(t)$ and integrate over the $t$-step.
 \subsubsection{AB2}
-For convenience, set $t=0$ at $y_n$. Then \[y_{n+1}=y_n+\int_0^\dt f(y_n,t)\dd t\]
- We use the points at $n$ and $n+1$ to fit a linear polynomial to $f$, i.e. $f(t)=at+b$.
+For convenience, set $t=0$ at $y_n$. Then \[y_{n+1}=y_n+\int_0^{\dt} f(y_n,t)\dd t\]
+ We use the points at $n$ and $n+1$ to fit a linear polynomial to $f_n$, i.e. $f(t)=at+b$. At $t=0$, $f_n=b$ and at $t=-\dt$, $f_{n-1}=-a\dt+b$. It follows that $b=f_n$ and $a=\frac{f_n-f_{n-1}}{\dt}$. Thus, \[y_{n+1}=y_n+\int_0^{\dt}(at+b)\dd t=y_n+\Paren{\frac{a}2(\dt)^2+b\dt}=y_n+\Paren{\frac32f_n-\frac12f_{n-1}}\dt.\]
+ This defines the second order Adams-Bashforth method.
 \subsubsection{AB3}
-
-Higher order methods can be derived in a similar way. Note that AB1 is forward Euler.
+Similarly, fitting a second order $f(t)=at^2+bt+c$ at times $t\in\set{0,-\dt,-2\dt}$ yields \[c=f_n,\quad a=\frac{f_{n-2}-2f_{n-1}+f_n}{2(\dt)^2}, \quad b=\frac{f_{n-2}-4f_{n-1}+3f_n}{2\dt}.\] By integrating, we arrive at \[y_{n+1}=y_n+\Paren{\frac5{12}f_{n-2}-\frac{16}{12}f_{n-1}+\frac{23}{12}f_n}\dt.\]
+Higher order methods can be derived in a similar way. Note that AB1 is forward Euler. If we use $f_{n+1}$ instead of $f_{n-1}$, we get the family of implicit Adams-Moulton methods (of which backward Euler is a member of).
+\begin{ex}
+	Show that the coefficients of $f_i$ in an Adams-Bashforth method always sum to 1.
+\end{ex}
 
 \subsection{Numerical stability}
+Consider the differential equation $\dder yt=-\lambda y$ (for $\lambda>0$) with initial condition $y(0)=y_0$. The exact solution is $y=y_0e^{-\lambda t}$. We say that a scheme is \emph{numerically stable} if $y_n\to 0$ as $n\to \infty$.
+
+For forward Euler, \[y_{n}=(1-\lambda \dt)y_n =(1-\lambda \dt)^ny_0.\] Thus, if $|1-\lambda \dt|>1$, $y_n$ grows and thus is unstable. So we need $\dt\leq\frac2\lambda$ for stability. 
+
+For backward Euler, \[y_n=\frac{y_n}{1+\lambda \dt}=\Paren{\frac{1}{1+\lambda\dt}}^ny_0.\] Since $\frac{1}{1+\lambda\dt}<1$ for all $\dt>0$, backward Euler is unconditionally stable. Similarly, implicit midpoint is also unconditionally stable as \[y_n=\Paren{\frac{1-\frac\lambda2\dt}{1+\frac\lambda2\dt}}^ny_n.\]
 
 \section{Partial differential equations}
 	A general linear second order PDE in two variables is given by \[a\pder\phi{x_1}+b\frac{\partial^2\phi}{\partial x_1\partial x_2}+c\pder\phi{x_2}+d\der\phi{x_1}+e\der\phi{x_2}+f\phi = g.\]
@@ -281,20 +293,22 @@ This PDE is called \emph{elliptic} if none of the eigenvalues vanish and all hav
 
 \subsection{Parabolic PDEs}
 
-Consider the diffusion equation \[\der\phi t=\kappa\pder\phi x.\] This is a parabolic second order PDE. We need boundary conditions...
+Consider the diffusion equation with diffusivity $\kappa>0$ \[\der\phi t=\kappa\pder\phi x.\] This is a parabolic second order PDE. 
 
 Diffusing equations have causality, i.e. the direction of time matters. Information spreads on scales $\delta\sim\sqrt{\kappa t}$ as in Figure~\ref{fig:diffusionTopHat} - the time step cannot be larger, otherwise the scheme becomes unstable.
 
-\begin{figure}\centering
-	\includegraphics[width=0.7\textwidth]{example-image-golden}
-	\caption{Diffusion spreading}\label{fig:diffusionTopHat}
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth]{diffusionSpreading}
+	\caption{Diffusion spreading}
+	\label{fig:diffusionTopHat}
 \end{figure}
 
 \begin{eg}
 	Consider diffusion equation on $0\leq x\leq L$ and $0\leq t\leq T$.  Let $\phi_j^n=\phi(x_j,t_n)$ where $t_n=n\dt$ and $x_j=j\dx$. The domain is discretised in Figure~\ref{fig:diffusionDiscret}.
 	
 	\begin{figure}\centering
-		\includegraphics[width=0.7\textwidth]{example-image-golden}
+		\includegraphics[width=0.7\textwidth]{discretisingDiffusion}
 		\caption{Discretising the diffusion equation domain}\label{fig:diffusionDiscret}
 	\end{figure}
 	
