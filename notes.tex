@@ -327,18 +327,20 @@ Dirichlet boundary conditions are easy to implement by setting $\phi$ at the bou
 
 
 \subsection{Hyperbolic PDEs}
-Consider the wave equation \[\ddder\phi t = c^2 \ddder\phi x.  \] This is a hyperbolic PDE. Factoring, \begin{equation}\label{eq:waveRe}\Paren{\der{}t + c\der{}x}\Paren{\der{}{t}-c\der{}x}\phi = 0.\end{equation} Let $p=x+ct$ and $q=x-ct$, then $x=\frac{p+q}2$ and $t=\frac{p-q}{2c}$. From the chain rule, it follows that \begin{align*}\der\phi p&=\der\phi x\der xp+\der\phi t\der tp=\frac12\der\phi x+\frac1{2c}\der\phi t\\\der\phi q&=\der\phi x\der xq+\der\phi t\der tq=...\end{align*}
-...
+Consider the wave equation \[\ddder\phi t = c^2 \ddder\phi x.  \] This is a hyperbolic PDE. Factoring, \begin{equation}\label{eq:waveRe}\Paren{\der{}t + c\der{}x}\Paren{\der{}{t}-c\der{}x}\phi = 0.\end{equation} Let $p=x+ct$ and $q=x-ct$, then $x=\frac{p+q}2$ and $t=\frac{p-q}{2c}$. From the chain rule, it follows that \begin{align*}\der\phi p&=\der\phi x\der xp+\der\phi t\der tp=\frac12\der\phi x+\frac1{2c}\der\phi t,\\\der\phi q&=\der\phi x\der xq+\der\phi t\der tq=\frac12\der\phi x -\frac{1}{2c}\der \phi t.\\
+\implies \der{}x&+c\der{}t = 2c\der{}p,\quad \der{}x-c\der{}t=-2c\der{}q.
+\end{align*}
+
 Substituting into Equation~\ref{eq:waveRe}, we get the hyperbolic PDE \[\der{^2\phi}{p\partial q}=0.\]
-Integrating with respect to $p$ and $q$, \[\der\phi q=f'(q) \implies \phi = f(q)+g(p),\] for some choice of $f$ and $g$. Thus $\phi(x, t)=f(x,t)+g(x,t)...$. We see that $\phi$ is constant along lines of $x-ct$ and $...$ as in Figure~\ref{fig:waveMove}.
+Integrating with respect to $p$ and $q$, \[\der\phi q=f'(q) \implies \phi = f(q)+g(p),\] for some choice of waves $f$ and $g$. Thus $\phi(x, t)=f(x-ct)+g(x+ct)$. We see that $\phi$ is constant along lines of $x-ct$ and $x+ct$ as in Figure~\ref{fig:waveMove}.
 
 \begin{figure}\centering
 	\includegraphics[width=0.7\textwidth]{example-image-golden}
-	\caption{Wave}\label{fig:waveMove}
+	\caption{Waves moving at constant speed $c$}\label{fig:waveMove}
 \end{figure}
 
-\begin{eg}
-	Consider the wave equation on $0\leq t\leq \infty$ and $0\leq x\leq L$. At time $t=0$, since we have a second derivative in time, we need two initial conditions (corresponding to $f$ and $g$). We need one boundary condition each on $x=0$ (corresponding to $f$) and $x=L$ (corresponding to $g$). This is illustrated in Figure~\ref{fig:waveDomain}. For example, we could take boundary conditions $\phi(x,0)$, $\der{}t\phi(x,0)$, $\phi(0,t)$ and $\phi(L,t)$.
+
+	Now consider the wave equation on $0\leq t\leq \infty$ and $0\leq x\leq L$. At time $t=0$, since we have a second derivative in time, we need two initial conditions (corresponding to $f$ and $g$). We need one boundary condition each on $x=0$ (corresponding to $f$) and $x=L$ (corresponding to $g$). This is illustrated in Figure~\ref{fig:waveDomain}. For example, we could take boundary conditions $\phi(x,0)$, $\der{}t\phi(x,0)$, $\phi(0,t)$ and $\phi(L,t)$.
 	
 	\begin{figure}\centering
 		\includegraphics[width=0.7\textwidth]{example-image-golden}
@@ -349,7 +351,7 @@ Integrating with respect to $p$ and $q$, \[\der\phi q=f'(q) \implies \phi = f(q)
 	 
 	 To solve the wave equation, we may use a centred difference for both second derivatives \[U_j^{n+1}-2U_j^n+U_j^{n-1}{(\dt)^2}=c^2\Paren{\frac{U^n_{j+1}-2U_j^n+U^n_{j-1}}{\dx^2}},\] where $U_j^n = \phi(x_jt_n)$ This is second order in both time and space. For stability, we need $\size{\dx}<\size{c\dt}$, i.e. the wave shouldn't travel more than one grid space in one time step.
 	
-\end{eg}
+
 \subsection{Advection equations}
 An advection equation has the form \[\der\phi t+u\der\phi x=0.\] This models a fluid parcel moving at velocity $u>0$ while maintaining its $\phi$. If $u$ is constant, then $\phi(x,t)=f(x-uy)$.
 
@@ -380,7 +382,7 @@ we get \[u\der\phi x \approx u\Paren{\frac{\phi_{j+1}^n-\phi_{j-1}^n}{2\dx}}=u\d
 Take the solution $\phi=\phi_0\exp(i(kx-wt))$. Pure advection becomes \[\der\phi t+u\der\phi x=-\implies -i\omega+iku =0\implies \frac\omega k = \dder\omega k=u.\]
 
 Numerically, \[\der\phi t+ u\der \phi x+\frac{u(\dx)^2}6\pder[3]\phi x=0\implies -i\omega+iku-ik^3\frac{u(\dx)^2}{6}=0\]
-Then \[\frac{\omega}k=u-\frac{u(\dx)^2}{6}k^2,\quad \dder\omega k= u +...\]
+Then \[\frac{\omega}k=u-\frac{u(\dx)^2}{6}k^2,\quad \dder\omega k= u -\frac{u(\dx)^2}{6}k^2.\]
 \section{Von Neumann analysis}
 
 
