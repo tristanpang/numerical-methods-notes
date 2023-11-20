@@ -4,6 +4,7 @@
 \usepackage{amsmath}
 \usepackage{amsfonts,amsthm,amssymb,enumerate}
 \usepackage{pgf,tikz,calc}
+\usetikzlibrary{patterns}
 \usepackage{graphicx}
 \graphicspath{{./figures/}}
 \usepackage[hidelinks]{hyperref}
@@ -247,7 +248,7 @@ We need to use forward Euler for the first step. A stencil is shown in figure~\r
 		\newcommand{\last}{9}
 		\foreach\x in {0,...,\last}{
 		\node (\x) at (\x,0) {\textbullet};
-		\node[below] at (\x){\x};}
+		\node[below] at (\x){$t_\x$};}
 		
 		\foreach[evaluate={\y=int(\x+1)},evaluate={\z=int(\x-1)},evaluate={\a=int(\x-2)}]\x in {\last}{
 		\node (\y) at (\y, 0){};		
@@ -324,7 +325,33 @@ Diffusing equations have causality, i.e. the direction of time matters. Informat
 	Consider diffusion equation on $0\leq x\leq L$ and $0\leq t\leq T$.  Let $\phi_j^n=\phi(x_j,t_n)$ where $t_n=n\dt$ and $x_j=j\dx$. The domain is discretised in Figure~\ref{fig:diffusionDiscret}.
 	
 	\begin{figure}\centering
-		\includegraphics[width=0.7\textwidth]{discretisingDiffusion}
+%		\includegraphics[width=0.7\textwidth]{discretisingDiffusion}
+		
+	\begin{tikzpicture}
+		\newcommand{\last}{3}
+		\foreach\x in {0,...,\last}{
+		\node (x\x) at (\x,0) {\textbullet};
+		\ifnum\x=0\else \node[below] at (x\x){$x_\x$}; \fi
+		\node (t\x) at (\x,-1) {\textbullet};
+		\node[below] at (t\x){$t_\x$};}
+		\node[below right] at (x0){$x_0$};
+		
+		\foreach[evaluate={\y=int(\x+1)}]\x in {\last}{
+		\node (x\y) at (\y, 0){\ldots};		
+		\node (t\y) at (\y, -1){\ldots};		
+		\foreach[evaluate={\j=int(\i+1)}]\i in {0,1,...,\last}{
+		\draw[->](t\i) to[bend left=45] (t\j);}}
+		
+		\foreach[evaluate={\y=int(\x+2)}]\x in {\last}{
+		\node (x\y) at (\y,0) {\textbullet};
+		\node[below left] at (x\y){$x_J$};
+		\node (t\y) at (\y,-1) {\textbullet};
+		\node[below] at (t\y){$t_N$};
+		
+		\node[above] at (-.25,.5) {\textsc{wall}};
+ 		\fill[pattern=north west lines] (\y,-.5) rectangle ++(.5,1);
+ 		\fill[pattern=north west lines] (0,-.5) rectangle ++(-.5,1);}
+	\end{tikzpicture}
 		\caption{Discretising the diffusion equation domain}\label{fig:diffusionDiscret}
 	\end{figure}
 	
