@@ -316,8 +316,8 @@ Diffusing equations have causality, i.e. the direction of time matters. Informat
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.7\textwidth]{diffusionSpreading}
-	\caption{Diffusion spreading}
+	\includegraphics[width=0.7\textwidth]{diffusionSpreading2}
+	\caption{Diffusion with $\kappa=1$ for the top hat function.}
 	\label{fig:diffusionTopHat}
 \end{figure}
 
@@ -355,7 +355,7 @@ Diffusing equations have causality, i.e. the direction of time matters. Informat
 		\caption{Discretising the diffusion equation domain}\label{fig:diffusionDiscret}
 	\end{figure}
 	
-	Using forward Euler, \[\frac{\phi_j^{n+1}-\phi_j^n}{\dt}=\kappa\frac{\phi_{j+1}^n-2\phi_j^n+\phi^n_{j-1}}{(\dx)^2}.\] It follows that \[\phi_j^{n+1}=\phi_j^n+\frac{\kappa\dt}{(\dx)^2}\Paren{\phi_{j+1}^n-2\phi_n^n+\phi_{j-1}^n}.\] This is straightforward to solve as forward Euler explicit. On the other hand, implicit backward Euler is \[\frac{\phi_j^{n+1}-\phi_j^n}{\dt}=\kappa\frac{\phi_{j+1}^{n+1}-2\phi_j^{n+1}+\phi^{n+1}_{j-1}}{(\dx)^2}.\] There are three unknowns, so we can not solve this directly. We solve this in Section~\ref{sec:elliptic}.
+	Using forward Euler, \[\frac{\phi_j^{n+1}-\phi_j^n}{\dt}=\kappa\frac{\phi_{j+1}^n-2\phi_j^n+\phi^n_{j-1}}{(\dx)^2}.\] It follows that \[\phi_j^{n+1}=\phi_j^n+\frac{\kappa\dt}{(\dx)^2}\Paren{\phi_{j+1}^n-2\phi_j^n+\phi_{j-1}^n}.\] This is straightforward to solve as forward Euler explicit. On the other hand, implicit backward Euler is \[\frac{\phi_j^{n+1}-\phi_j^n}{\dt}=\kappa\frac{\phi_{j+1}^{n+1}-2\phi_j^{n+1}+\phi^{n+1}_{j-1}}{(\dx)^2}.\] There are three unknowns, so we can not solve this directly. We solve this in Section~\ref{sec:elliptic}.
 
 \end{eg}
 
@@ -494,6 +494,38 @@ A better way is to modify the array indices at the periodic boundaries, for exam
 
 $\bar{p}^y=$ is an average along the $y$ direction.
 
+
+\section{Von Neumann analysis}
+\newcommand{\A}[1]{A^{(#1)}}
+Von Neumann analysis studies the stability of numerical methods by treating the numerical solution as a series of waves. If any of these waves grow, the scheme is unstable.
+\begin{eg}[Diffusion equation with forward Euler]
+	The forward Euler discretisation of $\der\phi t=\kappa\pder\phi x$ ($\kappa>0$ and $\dt>0$) is \[\frac{\phi_j^{n+1}-\phi_j^n}{\dt}=\kappa\frac{\phi_{j+1}^n-2\phi_j^n+\phi^n_{j-1}}{(\dx)^2}.\]
+	
+
+	Suppose we have a solution $\phi_j^n=\A{n}(k)\exp(ikx_j)$. Substituting this into the discretisation, ...
+	
+	Using the fact that $x_j=j\dx$, $\exp(ikx_{j+1})=\exp(ikx_j)\exp(ik\dx)$. Thus...
+	
+	It follows that \[ \frac{\A{n+1}}{\A n}= 1-2\frac{\kappa \dt}{(\dx)^2}(1-\cos( k\dx)).\] For the scheme to be stable, we want $\Size{\frac{\A{n+1}}{\A n}} \leq1$. Since $0\leq 1-\cos\leq 2$, we have that \[\Size{\frac{\A{n+1}}{\A n}} \implies \frac{2\kappa\dt}{(\dx)^2}\leq 1.\] Thus, for stability, we need $\dt \leq \frac{(\dx)^2}{2\kappa}$.
+\end{eg}
+\begin{eg}[Diffusion equation with backward Euler]The backward Euler discretisation is 
+	\[\frac{\phi_j^{n+1}-\phi_j^n}{\dt}=\kappa\frac{\phi_{j+1}^{n+1}-2\phi_j^{n+1}+\phi^{n+1}_{j-1}}{(\dx)^2}.\] The Von Neumann analysis is identical to forward Euler, except we have $\A{n+1}$ instead of $\A n$, i.e. 
+	\[\frac{\A{n+1}-\A n}{\dt}=\frac{\kappa}{(\dx)^2}\A{n+1}(2\cos (k\dx)-2).\] It follows that \[\frac{\A{n+1}}{\A n} =... \leq 1.\] Thus backward Euler is stable for any choice of $\dt$. 
+\end{eg}
+
+\begin{eg}[Upwind advection with forward Euler]
+	Forward Euler for $...$ ($u>0$) is \[\frac{\phi_j^{n+1}-\phi^n_j}{\dt}+u\frac{\phi_j^n-\phi_{j-1}^n}{\dx}=0.\] Substituting in $\phi_j^n=\A{n}(k)\exp(ikx_j)$, \[\frac{\A{n+1}+\A n}{\dt}+...=0.\]
+	It follows that \[\frac{\A{n+1}}{\A n}=1-\frac{u\dt}{\dx}(1-\exp(-ik\dx)).\] Taking norms, \begin{align*}\Size{\frac{\A{n+1}}{\A n}}^2&=\Paren{1-\frac{u\dt}{\dx}(1-\exp(-ik\dx))}\Paren{1-\frac{u\dt}{\dx}(1-\exp(ik\dx))}\\
+	&= 1-\frac{u\dt}{\dx}(2-\exp(ik\dx)-\exp(-ik\dx))+\Paren{\frac{u\dt}{\dx}}^2(2-\exp(i k\dx)-\exp(-ik\dx))\\&=1-\frac{u\dt}{\dx}\Paren{1-\frac{u\dt}{\dx}}\Paren{2-2\cos(k\dx)}.\end{align*} Since $2-2\cos\geq0$, for instability, we need \[\Size{[\frac{\A{n+1}}{\A n}}^2\geq 1 \text{ if } \frac{u\dt}{\dx}>1 \text{ or } \frac{u\dt}{\dx}<0.\] It follows that downwind is unstable. So we have stability if upwind and $\dt < \frac{\dx}{u}$.
+\end{eg}
+
+\begin{eg}[FTCS]
+
+\[\frac{\phi_j^{n+1}-\phi_j^n}{\dt}+u\frac{\phi_{j+1}^n-\phi_{j-1}^n}{2\dx}=0.\]
+Substituting $\phi_j^n=\A{n}(k)\exp(ikx_j)$, \[\frac{\A{n+1}}{\A n}-1 +\frac{iu\dt}{\dx}\Paren{\frac{\exp(ik\dx)-\exp(-ik\dx)}{2i}}=0.\] It follows that \[\Size{\frac{\A{n+1}}{\A n}}^2=\Size{1-\frac{iu\dt}{\dx}\sin(k\dx)}=1+\Paren{\frac{u\dt}{\dx}}^2\sin^2(k\dx)\geq 1.\] This scheme is always unstable.
+\end{eg}
+
+\section{Other numerical methods}
 
 \section{Numerical linear algebra}\label{sec:numla}
 
