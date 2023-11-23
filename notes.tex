@@ -80,9 +80,9 @@
 \makeatother
 \newcommand*{\ideal}[1]{\text{$\langle#1\rangle$}}%ideal
 \newcommand*{\Ideal}[1]{\text{$\left\langle#1\right\rangle$}}%ideal
-\def\matrixtwooneHelp(#1,#2){\begin{pmatrix}#1\\#2\end{pmatrix}}%matrix
-\def\matrixtwoHelp(#1,#2,#3,#4){\begin{pmatrix}#1&#2\\#3&#4\end{pmatrix}}%matrix
-\def\matrixthreeHelp(#1,#2,#3,#4,#5,#6,#7,#8,#9){\begin{pmatrix}#1&#2&#3\\#4&#5&#6\\#7&#8&#9 \end{pmatrix}}%matrix
+\def\matrixtwooneHelp(#1,#2){\begin{bmatrix}#1\\#2\end{bmatrix}}%matrix
+\def\matrixtwoHelp(#1,#2,#3,#4){\begin{bmatrix}#1&#2\\#3&#4\end{bmatrix}}%matrix
+\def\matrixthreeHelp(#1,#2,#3,#4,#5,#6,#7,#8,#9){\begin{bmatrix}#1&#2&#3\\#4&#5&#6\\#7&#8&#9 \end{bmatrix}}%matrix
 \newcommand*{\matrixtwo}[1]{\matrixtwoHelp(#1)}
 \newcommand*{\matrixtwoone}[1]{\matrixtwooneHelp(#1)}
 \newcommand*{\matrixthree}[1]{\matrixthreeHelp(#1)}
@@ -111,6 +111,11 @@
 \newcommand{\Eval}[1]{\bigg\rvert_{#1}}
 \newcommand{\dd}{\ \mathrm{d}}
 \newcommand{\lap}{\nabla^2}
+\newenvironment{amatrix}[1]{%
+	\left[\begin{array}{@{}*{#1}{c}|c@{}}
+	}{%
+	\end{array}\right]
+}
 \begin{document}
 \begin{center}
 {\LARGE Numerical Methods}\\
@@ -528,7 +533,70 @@ Substituting $\phi_j^n=\A{n}(k)\exp(ikx_j)$, \[\frac{\A{n+1}}{\A n}-1 +\frac{iu\
 \section{Other numerical methods}
 
 \section{Numerical linear algebra}\label{sec:numla}
+Matrix equations turn up in many places, for example when solving an elliptic equation. In general, we wish to solve \[A\ve x=\ve b\] where $A$ is an $n\times n$ matrix for $n$ very large. It is almost always inefficient to invert $A$, which takes $O(n^3)$ time and can be error prone, as there are faster methods that are $O(n^i)$ for $i<3$. There are two main classes of methods, direct solvers and iterative solvers.
 
+\subsection{Gaussian elimination}
+
+
+The usual method of solving $N$ equations in $N$ unknowns is to write one variable in terms of the others, then to eliminate that variable from the remaining $N-1$ equations. After proceeding inductively, the $N$-th equation will have one variable, and then we can back substitute to find the other variables.
+
+\begin{eg} Consider the linear system
+	\[\begin{cases}
+		\phantom{-}2x_1+x_2-\phantom{2}x_3=8\\-3x_1-x_2+2x_3=-11\\-2x_1+x_2+2x_3=-3
+	\end{cases}.\] The augmented matrix form is \[\begin{amatrix}{3}
+	2&1&-1&8\\-3&-1&2&-11\\-2&1&2&-3
+	\end{amatrix}.\]
+	To reduce this matrix, we can perform a sequence of elementary row operations (which are scaling rows, swapping rows, and adding a multiple of one row to another).
+	
+	We wish to first reduce the augmented matrix to an upper diagonal matrix of the form \[\begin{amatrix}{3}
+		\cdot&\cdot&\cdot &\cdot\\0&\cdot&\cdot&\cdot\\0&0&\cdot&\cdot
+	\end{amatrix}.\]
+	Then, we can perform back substitution to get a diagonal matrix \[\begin{amatrix}{3}
+		\cdot&0&0 &\cdot\\0&\cdot&0&\cdot\\0&0&\cdot&\cdot
+	\end{amatrix}.\]
+	For our example, the sequence of row reductions to get an upper triangular matrix is \[\begin{amatrix}{3}
+		2&1&-1&8\\-3&-1&2&-11\\-2&1&2&-3
+	\end{amatrix}\sim \begin{amatrix}{3}
+	2&1&-1&8\\0&\frac12&\frac12&1\\0&2&1&5
+	\end{amatrix}\sim\begin{amatrix}{3}
+	2&1&-1&8\\0&\frac12&\frac12&1\\0&0&-1&1
+	\end{amatrix}.\]
+	Back substitution gets us \[\begin{amatrix}{3}
+		2&1&-1&8\\0&\frac12&\frac12&1\\0&0&-1&1
+	\end{amatrix}\sim\begin{amatrix}{3}
+	2&1&0&7\\0&\frac12&0&\frac32\\0&0&-1&1
+	\end{amatrix}\sim\begin{amatrix}{3}
+	2&0&0&4\\0&\frac12&0&\frac32\\0&0&-1&1
+	\end{amatrix}.\]
+	Rescaling, \[\begin{amatrix}{3}
+		2&1&-1&8\\-3&-1&2&-11\\-2&1&2&-3
+	\end{amatrix}\sim\begin{amatrix}{3}
+		2&0&0&4\\0&\frac12&0&\frac32\\0&0&-1&1
+	\end{amatrix}\sim \begin{amatrix}{3}
+	1&0&0&2\\0&1&0&3\\0&0&1&-1
+	\end{amatrix}.\] It follows that $x_1=2$, $x_2=3$, $x_3=-1$.
+\end{eg}
+The general algorithm is [insert algorithm here]
+
+The first stage is $O(n^3)$, and the back substitution is $O(n^2)$. This is bad!
+
+
+\subsection{LU decomposition}
+The goal of LU decomposition is to factor $A=LU$, where $L$ is lower triangular and $U$ is upper triangular. After factoring, we can forward substitute and solve $LU\ve x=\ve b$ for $U\ve x=L\inv \ve b$, then to back substitute to solve for $\ve x$. Note that LU decomposition is not unique, but insisting that the diagonal entries of $L$ are 1 enforces uniqueness.
+\begin{eg} For a $3\times3$ matrix,
+	\[\matrixthree{1,0,0,L_{21},1,0,L_{31},L_{32},1}\matrixthree{U_{11},U_{12},U_{13},0,U_{22},U_{23},0,0,U_{33}}=\matrixthree{U_{11},U_{12},U_{13},L_{21}U_{11},L_{21}U_{12}+U_{22},L_{21}U_{13}+U_{23},L_{31}U_{11},L_{31}U_{12}+L_{32}U_{22},L_{31}U_{13}+L_{32}U_{23}+U_{33}}.\] By equating entries, \[A=\matrixthree{2,1,-1,-3,-1,2,-2,1,2} = \matrixthree{1,0,0,-\frac32,1,0,-1,4,1}\matrixthree{2,1,-1,0,\frac12,\frac12,0,0,-1}=LU.\]
+	It follows that via forward and backward substitution that \[U\ve x=L\inv \ve b=\begin{bmatrix} 8\\1\\1\end{bmatrix} \implies \ve x=U\inv L\inv b=\begin{bmatrix}2\\3\\-1\end{bmatrix}.\]
+\end{eg}
+The general algorithm for LU is [insert algorithm]
+
+The most expensive step of this algorithm is the LU factorisation. When solving a PDE, we need to keep solving the matrix system with the same matrix $A$, so it is worth computing $A=LU$ once, and reusing the factorisation for each time step and performing cheap substitution.
+
+If a diagonal entry is zero, we can swap rows to avoid division by zero. To minimise errors, use the row with the largest pivot. This is called LU factorisation with (partial) pivoting.
+
+Matrices from finite difference are sparse. LU decomposition is slow and takes a lot of memory (for very large matrices). Iterative methods are better for large sparse matrices.
+
+
+\subsection{Jacobi}
 
 \appendix
 \section{Background theory}
