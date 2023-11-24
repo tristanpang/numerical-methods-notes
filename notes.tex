@@ -137,8 +137,8 @@ Consider a sufficiently smooth function $f(x)$. If $f$ is a quadratic polynomial
 To find a zero $x^*$ of $f$, the bisection method takes two initial guesses $a$ and $b$ such that $a<0$ and $b\geq0$. IVT guarantees a zero between the two guesses. Calculate the midpoint \[c=\frac{a+b}2.\] If $f(c)<0$, replace $a$ with $c$; otherwise replace $b$ with $c$. Continue iterating until convergence is observed as shown in Figure~\ref{fig:bisection}.
 
 \begin{figure}\centering
-	\includegraphics[width=0.7\textwidth]{example-image-golden}
-	\caption{Bisection method}\label{fig:bisection}
+	\includegraphics[width=0.7\textwidth]{Bisection}
+	\caption{Bisection method on $x^2-2$ with starting guesses $a=1$, $b=4$.}\label{fig:bisection}
 \end{figure}
 
 The error at the first iteration is \begin{align*}
@@ -152,11 +152,11 @@ The positive zero of the polynomial $f(x)=x^2-2$ can be approximated using bisec
 \subsection{Newton's method}
 A quicker alternative to bisection is Newton's method (also known as Newton-Raphson). Given an initial guess $x_0$ and a sufficiently nice derivative $f'$, we may estimate a zero $x^*$ of $f$.
 
-Consider the Taylor expansion of $f$ around $x_n$ (see Appendix~\ref{sec:bigO} for the big $O$ notation and Appendix~\ref{sec:taylor} for Taylor): \[f(x)=f(x_n)+f'(x_n)(x-x_n)+O((x-x_n)^2).\] If we suppose that $x_n$ is close to the root $x^*$, the zero of the linear approximation $x_{n+1}$ is a good approximation for $x^*$ \[f(x_{n+1})\approx 0=f(x_n)+(x_{n+1}-x_n)f'(x_n).\] Rearranging, we arrive at the iterative formula for Newton's method \begin{equation}\label{eq:newtonStep} x_{n+1} = x_n-\frac{f(x_n)}{f'(x_n)}.\end{equation} This process is illustrated in Figure~\ref{fig:taylor}.
+Consider the Taylor expansion of $f$ around $x_n$ (see Appendix~\ref{sec:bigO} for the big $O$ notation and Appendix~\ref{sec:taylor} for Taylor): \[f(x)=f(x_n)+f'(x_n)(x-x_n)+O((x-x_n)^2).\] If we suppose that $x_n$ is close to the root $x^*$, the zero of the linear approximation $x_{n+1}$ is a good approximation for $x^*$ \[f(x_{n+1})\approx 0=f(x_n)+(x_{n+1}-x_n)f'(x_n).\] Rearranging, we arrive at the iterative formula for Newton's method \begin{equation}\label{eq:newtonStep} x_{n+1} = x_n-\frac{f(x_n)}{f'(x_n)}.\end{equation} This process is illustrated in Figure~\ref{fig:newton}.
 
 \begin{figure}\centering
-	\includegraphics[width=0.7\textwidth]{example-image-golden}
-	\caption{Newton's method}\label{fig:taylor}
+	\includegraphics[width=0.7\textwidth]{Newton}
+	\caption{Newton's method on $x^2-2$ with starting guess $x_0=5$. The green dotted lines are tangent to the curve.}\label{fig:newton}
 \end{figure}
 
 The signed error at iteration $n$ is $\epsilon_n = x_n-x^*$. By considering the quadratic term in the Taylor expansion around $x_n$, we get \begin{align*}f(x^*)&=f(x_n)+f'(x_n)(x^*-x_n)+\frac{f''(x_n)}{2}(x^*-x_n)^2 + O((x^*-x_n)^3)\\
@@ -226,8 +226,8 @@ Consider the IVP $\dder yt=-ky=f(y,t)$ with initial value $y(t_0)=1$. This can b
 \end{eg}
 
 \begin{figure}\centering
-	\includegraphics[width=0.7\textwidth]{example-image-golden}
-	\caption{Euler}\label{fig:euler}
+	\includegraphics[width=0.7\textwidth]{forwardEuler}
+	\caption{Forward Euler on $y'=y$ with initial $y(0)=1$.}\label{fig:euler}
 \end{figure}
 
 \subsection{Central difference}
@@ -292,7 +292,7 @@ For convenience, set $t=0$ at $y_n$. Then \[y_{n+1}=y_n+\int_0^{\dt} f(y_n,t)\dd
  This defines the second order Adams-Bashforth method.
 \subsubsection{AB3}
 Similarly, fitting a second order $f(t)=at^2+bt+c$ at times $t\in\set{0,-\dt,-2\dt}$ yields \[c=f_n,\quad a=\frac{f_{n-2}-2f_{n-1}+f_n}{2(\dt)^2}, \quad b=\frac{f_{n-2}-4f_{n-1}+3f_n}{2\dt}.\] By integrating, we arrive at \[y_{n+1}=y_n+\Paren{\frac5{12}f_{n-2}-\frac{16}{12}f_{n-1}+\frac{23}{12}f_n}\dt.\]
-Higher order methods can be derived in a similar way. Note that AB1 is forward Euler. If we use $f_{n+1}$ instead of $f_{n-1}$, we get the family of implicit Adams-Moulton methods (of which backward Euler is a member of).
+Higher order methods can be derived in a similar way. AB3 is a widely used method. Note that AB1 is forward Euler. If we use $f_{n+1}$ instead of $f_{n-1}$, we get the family of implicit Adams-Moulton methods (of which backward Euler is a member of).
 \begin{ex}
 	Show that the coefficients of $f_i$ in an Adams-Bashforth method always sum to 1.
 \end{ex}
@@ -303,6 +303,12 @@ Consider the differential equation $\dder yt=-\lambda y$ (for $\lambda>0$) with 
 For forward Euler, \[y_{n}=(1-\lambda \dt)y_n =(1-\lambda \dt)^ny_0.\] Thus, if $|1-\lambda \dt|>1$, $y_n$ grows and thus is unstable. So we need $\dt\leq\frac2\lambda$ for stability. 
 
 For backward Euler, \[y_n=\frac{y_n}{1+\lambda \dt}=\Paren{\frac{1}{1+\lambda\dt}}^ny_0.\] Since $\frac{1}{1+\lambda\dt}<1$ for all $\dt>0$, backward Euler is unconditionally stable. Similarly, implicit midpoint is also unconditionally stable as \[y_n=\Paren{\frac{1-\frac\lambda2\dt}{1+\frac\lambda2\dt}}^ny_n.\]
+\begin{figure}\centering
+	\includegraphics[width=0.99\textwidth]{ABstab}
+	\caption{Stability regions for Adam-Bashforth}\label{fig:ABstab}
+\end{figure}
+
+Similar stability analysis can be done for other methods. It is useful to plot stability regions on the complex plane (since we will work with eigenvalues instead of $\lambda$ for higher dimensions). In Figure~\ref{fig:ABstab}, we see that AB3 has the most desirable stability as higher order methods are less stable and Euler and AB2 are not accurate enough. Notice that AB3 also includes a segment of the imaginary axis. A more formal stability analysis is demonstrated in Section~\ref{sec:vonNeumann}. 
 
 \section{Partial differential equations}
 	A general linear second order PDE in two variables is given by \[a\pder\phi{x_1}+b\frac{\partial^2\phi}{\partial x_1\partial x_2}+c\pder\phi{x_2}+d\der\phi{x_1}+e\der\phi{x_2}+f\phi = g.\]
@@ -500,7 +506,7 @@ A better way is to modify the array indices at the periodic boundaries, for exam
 $\bar{p}^y=$ is an average along the $y$ direction.
 
 
-\section{Von Neumann analysis}
+\section{Von Neumann analysis}\label{sec:vonNeumann}
 \newcommand{\A}[1]{A^{(#1)}}
 Von Neumann analysis studies the stability of numerical methods by treating the numerical solution as a series of waves. If any of these waves grow, the scheme is unstable.
 \begin{eg}[Diffusion equation with forward Euler]

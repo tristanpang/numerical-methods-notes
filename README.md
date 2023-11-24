@@ -6,8 +6,8 @@ These are rough notes only. A polished version may or may not be completed. Plea
 
 | Lecture | Transcribed  | Figures  | Flavour |
 | :--: | :--: | :--: | :--: |
-| 1 | ✅ | 🚧 | ✅ |
-| 2 | ✅ | ❌ | ❌ |
+| 1 | ✅ | ✅ | ✅ |
+| 2 | ✅ | ✅ | 🚧 |
 | 3 | ✅ | ✅ | ❌ |
 | 4 | ✅ | ❌ | ❌ |
 | 5 | 🚧 | ❌ | ❌ |
