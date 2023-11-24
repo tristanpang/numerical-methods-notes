@@ -578,7 +578,7 @@ The usual method of solving $N$ equations in $N$ unknowns is to write one variab
 \end{eg}
 The general algorithm is [insert algorithm here]
 
-The first stage is $O(n^3)$, and the back substitution is $O(n^2)$. This is bad!
+The first stage is $O(n^3)$, and the back substitution is $O(n^2)$. 
 
 
 \subsection{LU decomposition}
@@ -596,7 +596,42 @@ If a diagonal entry is zero, we can swap rows to avoid division by zero. To mini
 Matrices from finite difference are sparse. LU decomposition is slow and takes a lot of memory (for very large matrices). Iterative methods are better for large sparse matrices.
 
 
-\subsection{Jacobi}
+\subsection{Relaxation methods}
+\newcommand{\xx}[1]{\ve x^{(#1)}}
+Consider the matrix equation $A\ve x=\ve b$, where $A$ is a sparse matrix (i.e. lots of zero entries). Relaxation methods work by splitting the matrix as $A=E-F$, where $E$ is easily invertible, and $F$ is the remainder. So $E\ve x= F\ve x+\ve b$. Suppose we have have an initial guess $\xx0$. Then \[E\xx0 =F\xx0 + ......\]
+
+Another way to describe relaxation methods is to consider an elliptic PDE \[\pder\phi x+\pder\phi y=f.\] This is a steady state solution to the diffusion equation \[\der\phi t=\pder\phi x+\pder\phi y - f.\]
+It can take a long time for a diffusion equation to converge, we focus on optimisations we can make. Using FTCS on the stencil in Figure~\ref{fig:FTCS2dStencil}, \[\phi_{i,j}^{n+1}=\phi^n_{i,j}+\frac{\dt}{(\dx)^2}\Paren{\phi_{i+1,j}^n+\phi_{i-1,j}^n+\phi_{i,j+1}^n+\phi_{i,j-1}^n-4\phi^n_{i,j}}-f_{i,j}\dt.\] This is stable (in 2d) if $\frac{\dt}{(\dx)^2}\leq \frac14$. Using the largest possible timestep $\dt = \frac{(\dx)^2}{4}$, \begin{equation}\label{eq:jacobiStep}\phi_{i,j}^{n+1}=\frac{1}{4}\Paren{\phi_{i+1,j}^n+\phi_{i-1,j}^n+\phi_{i,j+1}^n+\phi_{i,j-1}^n}-\frac{(\dx)^2}{4}f_{i,j}.\end{equation}
+
+\begin{figure}\centering
+	\includegraphics[width=0.7\textwidth]{example-image-golden}
+	\caption{FTCS 2d stencil}\label{fig:FTCS2dStencil}
+\end{figure}
+
+This is called \emph{Jacobi's method}. In matrix notation, we write $\ve x = (\phi_{i,j})$. Let $A=L+D+U$, where $L$ is strictly lower triangular, $U$ is strictly upper triangular and $D$ is diagonal. So we have \[D\xx{n+1}=-(L+U)\xx{n}+\ve b.\]
+
+[insert algorithm here]
+
+\subsection{Gauss-Seidel method}
+The Gauss-Seidel method is an improvement of Jacobi's method - we instead average the RHS of Equation~\ref{eq:jacobiStep} with updated values as soon as they become available. I.e. \[\phi_{i,j}^{n+1}=\frac14\Paren{\phi_{i+1,j+1}+\phi_{i-1,j}^{n+1}+\phi_{i,j+1}^n+\phi_{i,j-1}^{n+1}}-\frac{(\dx)^2}{4}f_{i,j}.\] In matrix notation, \[(L+D)\xx{n+1}=-U\xx n +ve b.\]
+
+[insert algorithm here]
+
+\subsection{Successive over relaxation}
+Both of the previous methods are slow. We can speed up using successive over relaxation (SOR) if we make over corrections. We first perform Gauss-Seidel \[\phi_{i,j}^{*}=\frac14\Paren{\phi_{i+1,j+1}+\phi_{i-1,j}^{n+1}+\phi_{i,j+1}^n+\phi_{i,j-1}^{n+1}}-\frac{(\dx)^2}{4}f_{i,j}.\]
+At the same time, we calculate \[\phi_{i,j}^{n+!}=\omega \phi_{i,j}^* - (\omega-1)\phi_{i,j}^n.\] We get faster convergence for $1<\omega<2$. In matrix form, \[D\ve x^*=-L\xx{n+1}-U\xx n+\ve b,\quad \xx{n+1}=\omega\Paren{-L\xx{n+1}-U\xx{n}+\ve b}+(\omega - 1)\xx n.\] Then we have \[ (D+\omega L)\xx{n+1}=\Paren{-\omega U+(\omega -1)D}\xx n +\omega\ve b.\]
+
+\subsection{Multigrid solvers}
+Given a problem on a fine grid, we can solve it easily on coarser grids.... read wiki
+
+\subsection{Conjugate gradient solvers}
+Let $A$ be symmetric positive definite ($\ve x^TA\ve x>0$ for all $\ve x\neq0$). The goal of the conjugate gradient method is to minimise the quadratic form \[f(\ve x)=\frac12 \ve x^T A \ve x- \ve b^T \ve x .\] If $A$ is symmetric, if $f'(\ve x)=0$, then $A\ve x=\ve b$.
+
+The steepest descent method is where for each step, we take a step in the direction of steepest descent. We continue until we get to the minimum. This is not ideal since we zigzag.
+
+To overcome this, we take conjugacy, where we travel orthogonally. The key is to make search directions $A$-orthogonal i.e. $\ve d_i^T A\ve d_j = 0$. This method is $O(n)$.
+
+The problem might need to be preconditioned, especially if the matrix is ill conditioned.
 
 \appendix
 \section{Background theory}
