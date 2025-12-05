@@ -403,7 +403,7 @@ Integrating with respect to $p$ and $q$, \[\der\phi q=f'(q) \implies \phi = f(q)
 	
 	 Adding an advection term complicates things. One way to treat advection is to use sponge layers.
 	 
-	 To solve the wave equation, we may use a centred difference for both second derivatives \[U_j^{n+1}-2U_j^n+U_j^{n-1}{(\dt)^2}=c^2\Paren{\frac{U^n_{j+1}-2U_j^n+U^n_{j-1}}{\dx^2}},\] where $U_j^n = \phi(x_jt_n)$ This is second order in both time and space. For stability, we need $\size{\dx}<\size{c\dt}$, i.e. the wave shouldn't travel more than one grid space in one time step.
+	 To solve the wave equation, we may use a centred difference for both second derivatives \[U_j^{n+1}-2U_j^n+U_j^{n-1}{(\dt)^2}=c^2\Paren{\frac{U^n_{j+1}-2U_j^n+U^n_{j-1}}{\dx^2}},\] where $U_j^n = \phi(x_jt_n)$ This is second order in both time and space. For stability, we need $\size{c\dt}<\size{\dx}$, i.e. the wave shouldn't travel more than one grid space in one time step.
 	
 
 \subsection{Advection equations}
